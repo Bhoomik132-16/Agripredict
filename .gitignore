@@ -1,0 +1,132 @@
+# ==============================================================================
+# AgriPredict .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment Variables & API Keys (Security Sensitive)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------------------------
+# 2. Heavy AI/ML Model Artifacts (>100 MB exceeds GitHub's file size limit)
+# Note: crop_recommendation_model.pkl (~1.09 GB) and yield_prediction_model.pkl (~167 MB).
+# Ignored globally so no large binary weight file is accidentally staged.
+# ------------------------------------------------------------------------------
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+*.bin
+*.weights
+*.safetensors
+models/*
+!models/.gitkeep
+checkpoints/
+
+# ------------------------------------------------------------------------------
+# 3. Local Databases & Flask Instance
+# ------------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+agripredict.db
+instance/
+
+# ------------------------------------------------------------------------------
+# 4. User Uploaded Images & Temporary Files
+# ------------------------------------------------------------------------------
+uploads/*
+!uploads/.gitkeep
+temp/
+tmp/
+*.tmp
+
+# ------------------------------------------------------------------------------
+# 5. Compressed Datasets & Archive Files (e.g., Kaggle zip downloads)
+# ------------------------------------------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ------------------------------------------------------------------------------
+# 6. Python Bytecode, Caches & Build Artifacts
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ------------------------------------------------------------------------------
+# 7. Virtual Environments
+# ------------------------------------------------------------------------------
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 8. Caches, Testing & Jupyter Notebooks
+# ------------------------------------------------------------------------------
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ------------------------------------------------------------------------------
+# 9. IDE, OS & Assistant Metadata
+# ------------------------------------------------------------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+*.sublime-project
+.antigravity/
+.gemini/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ------------------------------------------------------------------------------
+# 10. Logs
+# ------------------------------------------------------------------------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

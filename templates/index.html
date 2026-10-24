@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriPredict | Smart Agri-Tech Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 9L3 22H21L21 9L12 2Z" fill="#2ecc71" opacity="0.3"/>
+                <path d="M12 5V22M12 12C9 12 7 9 7 9C7 9 9 6 12 6C15 6 17 9 17 9C17 9 15 12 12 12Z" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            AgriPredict
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="#services">Services</a>
+            <a href="#support">About Us</a>
+            <a href="#support">Contact Us</a>
+            <a href="/dashboard" id="nav-dashboard" style="display:none;">Dashboard</a>
+            <a href="/marketplace" id="nav-marketplace" style="display:none;">Marketplace</a>
+            <a href="/admin" id="nav-admin" style="display:none;">Admin</a>
+        </div>
+        <div>
+            <a href="/auth" class="auth-btn" id="nav-auth">Sign In</a>
+            <button class="btn-secondary" id="nav-logout" style="display:none;" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Empowering Farmers <br>& Vendors Globally</h1>
+            <p>Direct B2B marketplace with AI-driven yield predictions and state-of-the-art marketing analytics.</p>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+                <a href="/auth" class="btn-primary">Get Started</a>
+                <a href="#marketing" class="btn-secondary">Platform Reach</a>
+            </div>
+        </div>
+        <div style="margin-top: 50px; display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px;">
+            <img src="/static/images/hero1.png" alt="Crops" style="width: 300px; height: 200px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <img src="/static/images/hero2.png" alt="Market" style="width: 300px; height: 200px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Professional Services Section -->
+        <section id="services" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="text-align: center; margin-bottom: 50px;">
+                <h2 style="color: var(--primary-green); font-size: 2.5rem;">Our Comprehensive Services</h2>
+                <p style="color: var(--text-secondary);">Tailored solutions for every step of your agricultural journey.</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
+                <div class="glass-panel service-card">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🌩️</div>
+                    <h3 style="color: white; margin-bottom: 10px;">Weather Services</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Stay ahead with hourly updates, precipitation forecasts, and humidity levels crucial for planning your harvest.</p>
+                </div>
+                <div class="glass-panel service-card">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🚨</div>
+                    <h3 style="color: white; margin-bottom: 10px;">Early Warning System</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Protect your yield with real-time alerts for severe weather, pests, and diseases tailored to your specific location.</p>
+                </div>
+                <div class="glass-panel service-card">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🏬</div>
+                    <h3 style="color: white; margin-bottom: 10px;">Market Access</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Simplify buying and selling with our magic matching system that connects you with verified vendors instantly.</p>
+                </div>
+                <div class="glass-panel service-card" style="border: 1px solid rgba(155, 89, 182, 0.4);">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🔬</div>
+                    <h3 style="color: white; margin-bottom: 10px;">CNN Crop Disease Classifier</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">
+                        Powered by <strong>MobileNetV2 Deep Learning CNN</strong>. Upload leaf photos on the Dashboard for instant disease detection, confidence scores, and treatment advice.
+                    </p>
+                    <a href="/dashboard" class="tag" style="background: rgba(155, 89, 182, 0.2); color: #9b59b6; text-decoration: none; display: inline-block;">
+                        Try CNN Scanner →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CRM / Support & Privacy Section -->
+        <section id="support" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px;">
+                <!-- Professional FAQs -->
+                <div>
+                    <h2 style="color: var(--primary-green); margin-bottom: 30px;">Frequently Asked Questions</h2>
+                    <div class="faq-item" style="margin-bottom: 25px;">
+                        <h4 style="color: white; margin-bottom: 8px;">1. How does the SCM (Supply Chain) process work?</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                            Once a vendor places an order, our Admin team initiates the SCM protocol. We manage the collection from the farm, quality inspection, and logistics. Contact details are shared only after the initial logistics are verified.
+                        </p>
+                    </div>
+                    <div class="faq-item" style="margin-bottom: 25px;">
+                        <h4 style="color: white; margin-bottom: 8px;">2. What does the 30% commission cover?</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                            The commission is vital for maintaining our ecosystem. It covers end-to-end transportation costs, AI model maintenance, verified buyer filtering, and local hub storage fees.
+                        </p>
+                    </div>
+                    <div class="faq-item" style="margin-bottom: 25px;">
+                        <h4 style="color: white; margin-bottom: 8px;">3. Can I use the Yield Predictor for any crop?</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                            Currently, our AI supports major staples like Rice, Wheat, Maize, Cotton, and Sugarcane across all 28 Indian states. We are constantly expanding our datasets to include more horticultural crops.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Support Form -->
+                <div class="glass-panel" style="background: rgba(46, 204, 113, 0.05); border: 1px solid rgba(46, 204, 113, 0.2);">
+                    <h3 style="margin-bottom: 20px;">Say Hello To Us :)</h3>
+                    <form onsubmit="handleSupportSubmit(event)">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" placeholder="Your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="support-category" class="form-control">
+                                <option value="General">General Inquiry</option>
+                                <option value="Technical">Technical Issue</option>
+                                <option value="Logistics">SCM / Delivery</option>
+                                <option value="Billing">Billing / Commission</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Write your message here...</label>
+                            <textarea id="support-message" class="form-control" rows="5" placeholder="Tell us how we can help..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Submit Message</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Professional Privacy Policy Document -->
+            <div class="glass-panel" style="margin-top: 60px; padding: 40px;">
+                <h2 style="color: var(--primary-green); margin-bottom: 25px;">Professional Privacy Policy</h2>
+                <div style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; max-height: 300px; overflow-y: auto; padding-right: 15px;">
+                    <p><strong>Last Updated: April 11, 2026</strong></p>
+                    <p style="margin-top: 15px;">Welcome to AgriPredict. We are committed to protecting your agricultural data and personal information. This policy outlines how we handle data for Farmers, Vendors, and Partners.</p>
+                    
+                    <h4 style="color: white; margin: 20px 0 10px 0;">1. Data Collection</h4>
+                    <p>We collect location data (GPS/State), soil nitrogen levels, rainfall estimates, and phone numbers. This data is used solely to refine AI yield models and facilitate B2B connections.</p>
+                    
+                    <h4 style="color: white; margin: 20px 0 10px 0;">2. Role-Based Visibility</h4>
+                    <p>Farmer contact details (Email/Mobile) are <strong>strictly hidden</strong> from the public. These credentials are only released by the System Admin once a Vendor places a verified order and the SCM process begins.</p>
+                    
+                    <h4 style="color: white; margin: 20px 0 10px 0;">3. Third-Party Sharing</h4>
+                    <p>AgriPredict does NOT sell your data to third-party marketing firms. Data may be shared with logistics partners only to ensure the physical delivery of agricultural produce.</p>
+                    
+                    <h4 style="color: white; margin: 20px 0 10px 0;">4. Security Protocols</h4>
+                    <p>All passwords are encrypted using high-security hashing (Werkzeug). We use industry-standard tokens for session management and database security.</p>
+                </div>
+            </div>
+        </section>
+        <!-- Global Reach / Marketing Analytics Section -->
+        <section id="marketing" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="text-align: center; margin-bottom: 50px;">
+                <h2 style="color: var(--primary-green); font-size: 2.5rem;">Global Connectivity & Reach</h2>
+                <p style="color: var(--text-secondary);">Real-time metrics of our expanding agricultural network.</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: center;">
+                <div class="glass-panel" style="background: rgba(59, 89, 152, 0.1); border-color: rgba(59, 89, 152, 0.3);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">👥</div>
+                    <h3 style="color: white; font-size: 2rem;">12.5k+</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem;">Facebook Connections</p>
+                </div>
+                <div class="glass-panel" style="background: rgba(225, 48, 108, 0.1); border-color: rgba(225, 48, 108, 0.3);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">📸</div>
+                    <h3 style="color: white; font-size: 2rem;">8.2k+</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem;">Instagram Reach</p>
+                </div>
+                <div class="glass-panel" style="background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.3);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">📲</div>
+                    <h3 style="color: white; font-size: 2rem;">25k+</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem;">Direct Ad Impressions</p>
+                </div>
+                <div class="glass-panel" style="background: rgba(52, 152, 219, 0.1); border-color: rgba(52, 152, 219, 0.3);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🤝</div>
+                    <h3 style="color: white; font-size: 2rem;">5.1k+</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem;">Successful B2B Deals</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Professional Multi-Column Footer -->
+    <footer style="background: #0f1a13; padding: 60px 0 30px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 50px;">
+        <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px;">
+            <div>
+                <h3 style="color: var(--primary-green); margin-bottom: 20px;">AgriPredict</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.6;">
+                    AgriPredict is a cutting-edge platform dedicated to empowering global farmers and vendors through data-driven SCM and AI yield predictions.
+                </p>
+                <ul style="list-style: none; color: var(--text-secondary); font-size: 0.9rem; line-height: 2;">
+                    <li><a href="#support" style="color: inherit; text-decoration: none;">About Us</a></li>
+                    <li><a href="#support" style="color: inherit; text-decoration: none;">Privacy Policy</a></li>
+                    <li><a href="#support" style="color: inherit; text-decoration: none;">Cookie Preferences</a></li>
+                    <li><a href="#support" style="color: inherit; text-decoration: none;">Terms of Service</a></li>
+                    <li><a href="#support" style="color: inherit; text-decoration: none;">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: white; margin-bottom: 20px;">Apps</h3>
+                <ul style="list-style: none; color: var(--text-secondary); font-size: 0.9rem; line-height: 2;">
+                    <li>Android App</li>
+                    <li>Web Portal</li>
+                    <li>USSD Service</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: white; margin-bottom: 20px;">Services</h3>
+                <ul style="list-style: none; color: var(--text-secondary); font-size: 0.9rem; line-height: 2;">
+                    <li><a href="#services" style="color: inherit; text-decoration: none;">Weather Forecasts</a></li>
+                    <li><a href="#services" style="color: inherit; text-decoration: none;">Early Warning System</a></li>
+                    <li><a href="#services" style="color: inherit; text-decoration: none;">Crop Diagnosis</a></li>
+                    <li><a href="#services" style="color: inherit; text-decoration: none;">Market Access</a></li>
+                    <li><a href="#services" style="color: inherit; text-decoration: none;">Extension Services</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: white; margin-bottom: 20px;">Connect With Us</h3>
+                <ul style="list-style: none; color: var(--text-secondary); font-size: 0.9rem; line-height: 2;">
+                    <li style="margin-bottom: 10px; color: var(--primary-green);">📍 102, AgriTech Hub, Bandra Kurla Complex, Mumbai, Maharashtra 400051</li>
+                    <li style="margin-bottom: 15px; color: var(--primary-green);">📞 +91 22 2654 0000 | +91 98XXX XXXXX</li>
+                    <li>Facebook</li>
+                    <li>Instagram</li>
+                    <li>LinkedIn</li>
+                </ul>
+            </div>
+        </div>
+        <div class="container" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+            &copy; 2026 AgriPredict AI Platform. All Rights Reserved. Empowering Global Agriculture.
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNav();
+        });
+
+        async function handleSupportSubmit(e) {
+            e.preventDefault();
+            const user = getUser();
+            if(!user) { alert("Please login to submit support tickets."); return; }
+            
+            const message = document.getElementById('support-message').value;
+            const category = document.getElementById('support-category').value;
+            
+            const res = await fetch('/api/support', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: user.id, message, category })
+            });
+
+            if(res.ok) {
+                alert("Thank you for your feedback! Our CRM team will get back to you.");
+                document.getElementById('support-message').value = '';
+            }
+        }
+    </script>
+
+    {% include 'chatbot_widget.html' %}
+</body>
+</html>

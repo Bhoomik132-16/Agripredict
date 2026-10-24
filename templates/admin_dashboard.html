@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin SCM Workspace - AgriPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 9L3 22H21L21 9L12 2Z" fill="#2ecc71" opacity="0.3"/>
+                <path d="M12 5V22M12 12C9 12 7 9 7 9C7 9 9 6 12 6C15 6 17 9 17 9C17 9 15 12 12 12Z" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            AgriPredict Admin
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/admin" class="active">Management</a>
+        </div>
+        <div>
+            <button class="btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stats Bar -->
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 40px;">
+            <div class="glass-panel" style="flex: 1; min-width: 250px; text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 0.8rem;">Platform Revenue (30%)</p>
+                <h2 id="total-revenue" style="color: var(--primary-green);">₹0.00</h2>
+                <small style="color:var(--text-secondary); font-size:0.6rem;">Includes SCM Fees</small>
+            </div>
+            <div class="glass-panel" style="flex: 1; min-width: 250px; text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 0.8rem;">Farmers Connected</p>
+                <h2 id="farmer-count">0</h2>
+            </div>
+            <div class="glass-panel" style="flex: 1; min-width: 250px; text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 0.8rem;">Market Reach (Vendors)</p>
+                <h2 id="vendor-count">0</h2>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px;">
+            <!-- SCM & Delivery Manager -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 20px;">SCM & Delivery Pipeline</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; color: var(--text-secondary); font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                <th style="padding: 10px;">Farmer Credentials</th>
+                                <th style="padding: 10px;">Vendor Credentials</th>
+                                <th style="padding: 10px;">Deal Value</th>
+                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txn-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Visual Analytics -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <!-- Support Feedback Chart -->
+                <div class="glass-panel" style="text-align: center;">
+                    <h3 style="margin-bottom: 10px;">Platform Problems</h3>
+                    <p style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 15px;">Customer feedback analysis (%)</p>
+                    <canvas id="feedbackPieChart"></canvas>
+                </div>
+                <!-- Marketing Source Chart -->
+                <div class="glass-panel" style="text-align: center;">
+                    <h3 style="margin-bottom: 10px;">Marketing Connectivity (%)</h3>
+                    <canvas id="marketingPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Directory -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 20px;">Comprehensive User Directory</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; color: var(--text-secondary); font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px;">Role</th>
+                                <th style="padding: 10px;">Contact (Email/Mobile)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Support Tickets / Connectivity Portal -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 20px;">Customer Support & Feedback</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; color: var(--text-secondary); font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                <th style="padding: 10px;">User</th>
+                                <th style="padding: 10px;">Category</th>
+                                <th style="padding: 10px;">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="support-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        Chart.register(ChartDataLabels);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUser();
+            if(!user || user.role !== 'Admin') {
+                window.location.href = '/auth';
+            } else {
+                loadAdminInsights();
+            }
+        });
+
+        async function loadAdminInsights() {
+            const res = await fetch('/api/admin/stats');
+            const data = await res.json();
+            
+            document.getElementById('total-revenue').innerText = `₹${data.revenue.toFixed(2)}`;
+            document.getElementById('farmer-count').innerText = data.farmers;
+            document.getElementById('vendor-count').innerText = data.vendors;
+
+            // Common chart options for percentages
+            const chartOptions = {
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#fff' } },
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold', size: 10 },
+                        formatter: (value, ctx) => {
+                            let sum = 0;
+                            let dataArr = ctx.chart.data.datasets[0].data;
+                            dataArr.map(data => { sum += data; });
+                            let percentage = (value*100 / sum).toFixed(1)+"%";
+                            return percentage;
+                        }
+                    }
+                }
+            };
+
+            // Feedback Chart
+            new Chart(document.getElementById('feedbackPieChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(data.feedback),
+                    datasets: [{
+                        data: Object.values(data.feedback),
+                        backgroundColor: ['#e74c3c', '#f1c40f', '#3498db', '#95a5a6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // Marketing Chart
+            new Chart(document.getElementById('marketingPieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data.marketing),
+                    datasets: [{
+                        data: Object.values(data.marketing),
+                        backgroundColor: ['#3b5998', '#e1306c', '#2ecc71'],
+                        borderWidth: 0
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // User Directory
+            const userBody = document.getElementById('user-table');
+            userBody.innerHTML = '';
+            data.users.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                tr.innerHTML = `
+                    <td style="padding: 12px;">${u.name}</td>
+                    <td style="padding: 12px;"><span class="tag">${u.role}</span></td>
+                    <td style="padding: 12px;">${u.email}<br>${u.phone}</td>
+                `;
+                userBody.appendChild(tr);
+            });
+
+            // Support Tickets (CRM)
+            const supportRes = await fetch('/api/admin/support_tickets');
+            const tickets = await supportRes.json();
+            const supportBody = document.getElementById('support-table');
+            supportBody.innerHTML = '';
+            tickets.forEach(tk => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                tr.innerHTML = `
+                    <td style="padding: 12px;">${tk.user_name}<br><small>${tk.user_email}</small></td>
+                    <td style="padding: 12px;"><span class="tag">${tk.category}</span></td>
+                    <td style="padding: 12px; font-size: 0.8rem;">${tk.message}</td>
+                `;
+                supportBody.appendChild(tr);
+            });
+
+            // Transactions (SCM Manager)
+            const txnRes = await fetch('/api/admin/transactions');
+            const txns = await txnRes.json();
+            const txnBody = document.getElementById('txn-table');
+            txnBody.innerHTML = '';
+            txns.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                tr.innerHTML = `
+                    <td style="padding: 15px;">${t.farmer_name}<br><small>${t.farmer_email} | ${t.farmer_phone}</small></td>
+                    <td style="padding: 15px;">${t.vendor_name}<br><small>${t.vendor_email} | ${t.vendor_phone}</small></td>
+                    <td style="padding: 15px;">₹${t.total_price}</td>
+                    <td style="padding: 15px;"><span class="tag">${t.status}</span></td>
+                    <td style="padding: 15px;">
+                        ${t.status === 'OrderPlaced' ? `<button class="btn-primary" onclick="initiateSCM(${t.id})">Manage Delivery</button>` : ''}
+                        ${t.status === 'SCM_Managed' ? `<button class="btn-secondary" onclick="finalizeDeal(${t.id})">Finalize Deal</button>` : ''}
+                        ${t.status === 'Finalized' ? `✅ Done` : ''}
+                    </td>
+                `;
+                txnBody.appendChild(tr);
+            });
+        }
+
+        async function initiateSCM(id) {
+            if(confirm("Initiate Supply Chain Management & Contact Sharing?")) {
+                const res = await fetch('/api/admin/share_contacts', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ transaction_id: id })
+                });
+                if(res.ok) { alert("SCM status updated. Details shared."); loadAdminInsights(); }
+            }
+        }
+
+        async function finalizeDeal(id) {
+            if(confirm("Finalize transaction? Admin will collect 30% commission (includes logistics cost).")) {
+                const res = await fetch('/api/admin/finalize_deal', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ transaction_id: id })
+                });
+                if(res.ok) { loadAdminInsights(); }
+            }
+        }
+    </script>
+</body>
+</html>

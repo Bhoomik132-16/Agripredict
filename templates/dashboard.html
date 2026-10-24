@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Workspace - AgriPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 9L3 22H21L21 9L12 2Z" fill="#2ecc71" opacity="0.3"/>
+                <path d="M12 5V22M12 12C9 12 7 9 7 9C7 9 9 6 12 6C15 6 17 9 17 9C17 9 15 12 12 12Z" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <a href="/">AgriPredict</a>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard" class="active" style="color:var(--primary-green)">Dashboard</a>
+            <a href="/marketplace">Marketplace</a>
+        </div>
+        <div>
+            <button class="btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Stats Overview -->
+        <div id="stats-bar" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
+            <!-- Stats items injected here -->
+        </div>
+
+        <div style="display:flex; gap: 30px; flex-wrap: wrap;">
+        <!-- Prediction Form -->
+        <div class="glass-panel" style="flex: 2; min-width: 300px;" id="prediction-panel">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--primary-green);" id="predictor-title">Crop & Yield Predictor</h2>
+                <span id="user-location-badge" class="tag">Loading...</span>
+            </div>
+            
+            <div id="prediction-error" class="error-panel" style="display: none; margin-bottom: 20px;"></div>
+
+            <!-- Live Weather Card -->
+            <div id="weather-card" style="display:none; margin-bottom:20px; padding:16px; border-radius:14px; background:linear-gradient(135deg, rgba(46,204,113,0.1), rgba(52,152,219,0.1)); border:1px solid rgba(46,204,113,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div style="font-weight:700; font-size:0.9rem; color:#2ecc71;">🌤️ Live Weather</div>
+                    <span id="weather-city" style="font-size:0.75rem; color:var(--text-secondary);"></span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; text-align:center;">
+                    <div>
+                        <div style="font-size:1.4rem; font-weight:700; color:#e67e22;" id="weather-temp">--</div>
+                        <div style="font-size:0.65rem; color:var(--text-secondary); text-transform:uppercase;">Temperature °C</div>
+                    </div>
+                    <div>
+                        <div style="font-size:1.4rem; font-weight:700; color:#3498db;" id="weather-humidity">--</div>
+                        <div style="font-size:0.65rem; color:var(--text-secondary); text-transform:uppercase;">Humidity %</div>
+                    </div>
+                    <div>
+                        <div style="font-size:1.4rem; font-weight:700; color:#2ecc71;" id="weather-rain">--</div>
+                        <div style="font-size:0.65rem; color:var(--text-secondary); text-transform:uppercase;">Rainfall mm</div>
+                    </div>
+                </div>
+                <div id="weather-desc" style="text-align:center; font-size:0.75rem; color:var(--text-secondary); margin-top:8px; font-style:italic;"></div>
+            </div>
+
+            <form id="prediction-form" onsubmit="handlePrediction(event)">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Location (Indian State)</label>
+                        <select id="state" class="form-control" required onchange="fetchWeatherForState(this.value); updateCropVulnerabilityNotice(document.getElementById('crop_for_yield').value);">
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Land Area (Hectares)</label>
+                        <input type="number" step="0.1" id="area" class="form-control" required placeholder="e.g. 5">
+                    </div>
+                    <div class="form-group">
+                        <label>Nitrogen (N) [0-300 kg/ha]</label>
+                        <input type="number" id="n" class="form-control" required placeholder="e.g. 50" min="0" max="300">
+                        <p class="field-note">Promotes leafy growth. High N (100+) is good for Cereals/Grasses.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Phosphorus (P) [0-150 kg/ha]</label>
+                        <input type="number" id="p" class="form-control" required placeholder="e.g. 25" min="0" max="150">
+                        <p class="field-note">Boosts root health & flowering. Critical for Legumes & Potatoes.</p>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Potassium (K) [0-300 kg/ha]</label>
+                        <input type="number" id="k" class="form-control" required placeholder="e.g. 30" min="0" max="300">
+                        <p class="field-note">Improves disease resistance & fruit quality. High K (80+) is vital for fruits.</p>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Soil pH [3.5 - 10.0]</label>
+                        <input type="number" step="0.1" id="ph" class="form-control" required placeholder="e.g. 6.5" min="3.5" max="10">
+                        <p class="field-note">6.0-7.5 is the Sweet Spot. Below 5.5 = Acidic; Above 8.0 = Alkaline.</p>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Avg Temperature [10-45 °C]</label>
+                        <input type="number" step="0.1" id="temp" class="form-control" required placeholder="e.g. 28" min="10" max="45">
+                        <p class="field-note">Most crops thrive in 20-30°C. >35°C can cause heat stress.</p>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Rainfall [0-3000 mm]</label>
+                        <input type="number" step="0.1" id="rain" class="form-control" required placeholder="e.g. 1000" min="0" max="3000">
+                        <p class="field-note">Rice needs >1000mm; Wheat needs 600-900mm. Balance is key.</p>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Crop for Yield Prediction</label>
+                        <select id="crop_for_yield" class="form-control" required onchange="updateCropVulnerabilityNotice(this.value)">
+                            <option value="Rice">Rice</option>
+                            <option value="Wheat">Wheat</option>
+                            <option value="Maize">Maize</option>
+                            <option value="Sugarcane">Sugarcane</option>
+                            <option value="Cotton(lint)">Cotton</option>
+                            <option value="Jute">Jute</option>
+                            <option value="Groundnut">Groundnut</option>
+                            <option value="Rapeseed &Mustard">Mustard</option>
+                            <option value="Sunflower">Sunflower</option>
+                            <option value="Soyabean">Soyabean</option>
+                            <option value="Potato">Potato</option>
+                            <option value="Onion">Onion</option>
+                            <option value="Dry chillies">Chillies</option>
+                            <option value="Turmeric">Turmeric</option>
+                            <option value="Ginger">Ginger</option>
+                            <option value="Garlic">Garlic</option>
+                            <option value="Banana">Banana</option>
+                            <option value="Arecanut">Arecanut</option>
+                            <option value="Black pepper">Black Pepper</option>
+                            <option value="Cardamom">Cardamom</option>
+                            <option value="Cashewnut">Cashew</option>
+                            <option value="Tobacco">Tobacco</option>
+                            <option value="Bajra">Bajra</option>
+                            <option value="Jowar">Jowar</option>
+                            <option value="Ragi">Ragi</option>
+                            <option value="Gram">Gram</option>
+                            <option value="Arhar/Tur">Arhar/Tur</option>
+                            <option value="Moong(Green Gram)">Moong Dal</option>
+                            <option value="Urad">Urad Dal</option>
+                            <option value="Sesamum">Sesame</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Season</label>
+                        <select id="season_for_yield" class="form-control" required>
+                            <option value="Kharif">Kharif</option>
+                            <option value="Rabi">Rabi</option>
+                            <option value="Whole Year">Whole Year</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 20px; width: 100%;">Predict Best Crop & Yield</button>
+            </form>
+
+            <div id="prediction-results" style="display: none; margin-top: 30px;">
+                <h3 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px;">Top AI Recommendations (Realistic Selection)</h3>
+                
+                <div id="recommendations-container" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+                    <!-- Recommendations injected here -->
+                </div>
+
+                <div class="result-card" style="display: block; border-left-color: #2ecc71; background: rgba(46, 204, 113, 0.05); margin-bottom: 15px;">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">Predicted Potential Yield</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #fff;" id="yield-result">-- Tons</div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-primary" style="flex: 1; background: #3498db;" onclick="setToList()">Set Selected to Marketplace</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CNN Crop Leaf Disease Classifier (Deep Learning AI) -->
+        <div class="glass-panel" style="flex: 2; min-width: 300px; margin-top: 25px;" id="disease-panel">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="color: #9b59b6; margin: 0; display:flex; align-items:center; gap:8px;" id="cnn-panel-title">
+                    🔬 CNN Crop Disease Classifier
+                </h2>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <select id="cnn-lang-select" onchange="changeCnnLanguage(this.value)" class="tag" style="background: rgba(155, 89, 182, 0.25); color: #fff; border: 1px solid #9b59b6; cursor: pointer; padding: 4px 10px; font-weight:700; outline:none;">
+                        <option value="en" style="background:#111;">🌐 English</option>
+                        <option value="hi" style="background:#111;">🇮🇳 हिंदी (Hindi)</option>
+                        <option value="mr" style="background:#111;">🚩 मराठी (Marathi)</option>
+                        <option value="gu" style="background:#111;">🌾 ગુજરાતી (Gujarati)</option>
+                        <option value="pa" style="background:#111;">🌾 ਪੰਜਾਬੀ (Punjabi)</option>
+                        <option value="ta" style="background:#111;">🌾 தமிழ் (Tamil)</option>
+                        <option value="te" style="background:#111;">🌾 తెలుగు (Telugu)</option>
+                        <option value="bn" style="background:#111;">🌾 বাংলা (Bengali)</option>
+                    </select>
+                    <span class="tag" style="background: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.4);">
+                        MobileNetV2 CNN AI
+                    </span>
+                </div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px;" id="cnn-panel-subtitle">
+                Upload or drag a leaf photo to diagnose diseases using our trained Deep Learning Convolutional Neural Network (CNN).
+            </p>
+
+            <!-- Select Crop for Same State in CNN section -->
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="color: #9b59b6; font-weight: 700; font-size: 0.85rem;" id="cnn-crop-label">🌱 Select Crop to Check Disease Vulnerability (for Selected State)</label>
+                <select id="cnn_crop_select" class="form-control" onchange="onCnnCropChange(this.value)" style="border: 1px solid rgba(155, 89, 182, 0.5); background: rgba(155, 89, 182, 0.08); color: #fff; font-weight: 600;">
+                    <option value="Rice">Rice</option>
+                    <option value="Wheat">Wheat</option>
+                    <option value="Maize">Maize</option>
+                    <option value="Sugarcane">Sugarcane</option>
+                    <option value="Cotton(lint)">Cotton</option>
+                    <option value="Jute">Jute</option>
+                    <option value="Groundnut">Groundnut</option>
+                    <option value="Rapeseed &Mustard">Mustard</option>
+                    <option value="Sunflower">Sunflower</option>
+                    <option value="Soyabean">Soyabean</option>
+                    <option value="Potato">Potato</option>
+                    <option value="Onion">Onion</option>
+                    <option value="Dry chillies">Chillies</option>
+                    <option value="Turmeric">Turmeric</option>
+                    <option value="Ginger">Ginger</option>
+                    <option value="Garlic">Garlic</option>
+                    <option value="Banana">Banana</option>
+                    <option value="Arecanut">Arecanut</option>
+                    <option value="Black pepper">Black Pepper</option>
+                    <option value="Cardamom">Cardamom</option>
+                    <option value="Cashewnut">Cashew</option>
+                    <option value="Tobacco">Tobacco</option>
+                    <option value="Bajra">Bajra</option>
+                    <option value="Jowar">Jowar</option>
+                    <option value="Ragi">Ragi</option>
+                    <option value="Gram">Gram</option>
+                    <option value="Arhar/Tur">Arhar/Tur</option>
+                    <option value="Moong(Green Gram)">Moong Dal</option>
+                    <option value="Urad">Urad Dal</option>
+                    <option value="Sesamum">Sesame</option>
+                </select>
+            </div>
+
+            <!-- Pre-Predicted Crop Vulnerability Notice -->
+            <div id="crop-vulnerability-card" style="display: block; margin-bottom: 20px; padding: 16px; background: rgba(155, 89, 182, 0.08); border-radius: 14px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                <div style="font-size: 0.9rem; font-weight: 700; color: #9b59b6; margin-bottom: 6px; display:flex; align-items:center; gap:8px;">
+                    🛡️ <span id="vulnerability-crop-title">Pre-Predicted Disease Vulnerability for Rice</span>
+                </div>
+                <div style="font-size: 0.82rem; color: #e0e0e0; line-height: 1.5;" id="vulnerability-desc">
+                    Based on your selected crop (<strong>Rice</strong>), the pre-predicted primary disease risk is <strong>Rice Leaf Blight (Xanthomonas oryzae)</strong> & <strong>Rice Blast</strong>. Upload a leaf photo below to run the CNN classification check.
+                </div>
+            </div>
+
+            <form id="disease-form" onsubmit="analyzeDisease(event)">
+                <div class="form-group">
+                    <label id="cnn-upload-label">Select or Drop Leaf Image (JPG/PNG)</label>
+                    <input type="file" id="disease-file" accept="image/*" class="form-control" onchange="previewDiseaseImage(event)" style="padding: 8px;">
+                </div>
+
+                <div id="disease-preview-container" style="display:none; text-align:center; margin: 15px 0;">
+                    <img id="disease-preview-img" style="max-width: 100%; max-height: 200px; border-radius: 12px; border: 2px solid #9b59b6; object-fit: contain;">
+                </div>
+
+                <button type="submit" id="disease-btn" class="btn-primary" style="width: 100%; background: linear-gradient(135deg, #8e44ad, #9b59b6); border: none;">
+                    🔬 Scan Crop Leaf with CNN AI
+                </button>
+            </form>
+
+            <div id="disease-result-panel" style="display: none; margin-top: 25px; padding: 18px; background: rgba(155, 89, 182, 0.08); border-radius: 14px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 style="color: #fff; margin:0; font-size:1.1rem;" id="disease-name">--</h3>
+                    <span id="disease-severity-tag" class="tag">--</span>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                        <span style="color:var(--text-secondary);" id="cnn-confidence-label">CNN Confidence Score:</span>
+                        <span style="font-weight:700; color:#9b59b6;" id="disease-confidence">--%</span>
+                    </div>
+                    <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow:hidden;">
+                        <div id="disease-confidence-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #9b59b6, #2ecc71); transition: width 0.8s ease;"></div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; font-size: 0.82rem; line-height: 1.5;">
+                    <strong style="color: #9b59b6; display:block; margin-bottom:4px;" id="cnn-treatment-label">💊 Recommended Treatment Advice:</strong>
+                    <span id="disease-treatment" style="color: #e0e0e0;">--</span>
+                </div>
+                
+                <div style="margin-top:10px; font-size:0.7rem; color:var(--text-secondary); text-align:right;">
+                    ✅ Feature Verification: Result verified & logged to database.
+                </div>
+            </div>
+        </div>
+
+        <!-- Ecosystem Visibility -->
+        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 30px;">
+            <!-- Listing Form -->
+            <div class="glass-panel" id="listing-panel">
+                <h2 style="margin-bottom: 20px;">Sell Your Crops</h2>
+                <form id="listing-form" onsubmit="postListing(event)">
+                    <div class="form-group">
+                        <label>Crop for Sale</label>
+                        <input type="text" id="m-crop" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (Tons)</label>
+                        <input type="number" step="0.1" id="m-quantity" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price per Ton (₹)</label>
+                        <input type="number" step="0.1" id="m-price" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn-secondary" style="width: 100%;">Create Listing</button>
+                </form>
+                <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 15px; text-align: center;">
+                    * 30% SCM & Platform fee included in finalized deals.
+                </p>
+            </div>
+
+            <!-- Verified Partners (Dummy Data Visibility) -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 15px; font-size: 1rem;">Verified Partners</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85rem; font-weight: 600;">System Admin</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">SCM & Logistics Oversight</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85rem; font-weight: 600;">FreshFoods B2B</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Top Bulk Vendor</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Listings -->
+            <div class="glass-panel" id="my-listings-panel">
+                <h3 style="margin-bottom: 15px; font-size: 1rem;">My Active Listings</h3>
+                <div id="my-listings-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Loading your listings...</p>
+                </div>
+            </div>
+
+            <!-- Order Tracking (For Both) -->
+            <div class="glass-panel" style="border-top: 3px solid #3498db;" id="tracking-panel">
+                <h3 style="margin-bottom: 15px; font-size: 1rem; display: flex; align-items: center; gap: 10px;">
+                    📦 <span id="tracking-title">Order Tracking</span>
+                </h3>
+                <div id="orders-container" style="display: flex; flex-direction: column; gap: 15px;">
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Loading tracking data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUser();
+            if(!user) {
+                window.location.href = '/auth';
+            } else {
+                setupDashboard(user);
+                // Auto-fetch weather for default selected state
+                const stateEl = document.getElementById('state');
+                if(stateEl && user.role === 'Farmer') fetchWeatherForState(stateEl.value);
+            }
+        });
+
+        async function fetchWeatherForState(stateName) {
+            const card = document.getElementById('weather-card');
+            try {
+                card.style.display = 'block';
+                document.getElementById('weather-temp').innerText = '...';
+                document.getElementById('weather-humidity').innerText = '...';
+                document.getElementById('weather-rain').innerText = '...';
+
+                const res = await fetch(`/api/get-weather?city=${encodeURIComponent(stateName)}`);
+                const data = await res.json();
+
+                document.getElementById('weather-temp').innerText = data.temperature_c;
+                document.getElementById('weather-humidity').innerText = data.humidity_pct;
+                document.getElementById('weather-rain').innerText = data.rainfall_mm;
+                document.getElementById('weather-city').innerText = data.city + (data.source === 'fallback' ? ' (offline)' : ' • Live');
+                document.getElementById('weather-desc').innerText = data.description || '';
+
+                // Auto-fill temp & rainfall fields
+                const tempField = document.getElementById('temp');
+                const rainField = document.getElementById('rain');
+                if(tempField && data.source !== 'fallback') tempField.value = data.temperature_c;
+                if(rainField && data.source !== 'fallback') rainField.value = data.rainfall_mm;
+            } catch(err) {
+                console.error('Weather fetch error:', err);
+                card.style.display = 'none';
+            }
+        }
+
+        function setupDashboard(user) {
+            document.getElementById('user-location-badge').innerText = user.location || 'Global';
+            
+            if(user.role === 'Vendor') {
+                // Adjust for Vendor
+                document.getElementById('page-title').innerText = 'Vendor Procurement - AgriPredict';
+                document.getElementById('prediction-panel').style.display = 'none'; // Hidden for vendors as requested
+                document.getElementById('listing-panel').style.display = 'none';
+                document.getElementById('my-listings-panel').style.display = 'none';
+                document.getElementById('tracking-title').innerText = 'Procurement Tracking & Logistics';
+                
+                renderStats([
+                    { label: 'Purchases', value: '12 Tons', icon: '🛒' },
+                    { label: 'Active Deals', value: '4', icon: '🤝' },
+                    { label: 'Total Spent', value: '₹5.2L', icon: '💰' }
+                ]);
+            } else {
+                // Adjust for Farmer
+                document.getElementById('page-title').innerText = 'Farmer Workspace - AgriPredict';
+                document.getElementById('prediction-panel').style.display = 'block';
+                document.getElementById('tracking-title').innerText = 'Sales Tracking & Fulfillment';
+                loadMyListings();
+                
+                renderStats([
+                    { label: 'Predicted Yield', value: '8.5 Tons', icon: '📊' },
+                    { label: 'Crops Listed', value: '3', icon: '📦' },
+                    { label: 'Sales Potential', value: '₹4.2L', icon: '📈' }
+                ]);
+            }
+            loadOrders();
+        }
+
+        function renderStats(stats) {
+            const bar = document.getElementById('stats-bar');
+            if(!bar) return; // Defensive check to avoid crash
+            bar.innerHTML = stats.map(s => `
+                <div class="glass-panel" style="flex: 1; min-width: 150px; padding: 15px; display: flex; align-items: center; gap: 15px; margin: 0;">
+                    <div style="font-size: 1.5rem;">${s.icon}</div>
+                    <div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">${s.label}</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-green);">${s.value}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function handlePrediction(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const errorPanel = document.getElementById('prediction-error');
+            const resultsPanel = document.getElementById('prediction-results');
+            
+            errorPanel.style.display = 'none';
+            btn.innerText = 'Analyzing Data...';
+            btn.disabled = true;
+
+            const formData = {
+                state: document.getElementById('state').value,
+                area: document.getElementById('area').value,
+                n: document.getElementById('n').value,
+                p: document.getElementById('p').value,
+                k: document.getElementById('k').value,
+                ph: document.getElementById('ph').value,
+                temp: document.getElementById('temp').value,
+                rain: document.getElementById('rain').value,
+                crop_for_yield: document.getElementById('crop_for_yield').value,
+                season_for_yield: document.getElementById('season_for_yield').value
+            };
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                
+                if(res.ok) {
+                    // Display Yield
+                    document.getElementById('yield-result').innerText = `${data.yield} Tons`;
+                    
+                    // Display Top 3 Recommendations
+                    const container = document.getElementById('recommendations-container');
+                    container.innerHTML = data.recommendations.map((rec, index) => `
+                        <div class="recommendation-item ${index === 0 ? 'top-match' : ''}" 
+                             data-crop="${rec.crop}" 
+                             data-suitability="${rec.suitability}"
+                             onclick="selectCrop('${rec.crop}', '${rec.suitability}', this)">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-weight: 700; font-size: 1.1rem;">${rec.crop}</span>
+                                    ${index === 0 ? '<span class="tag" style="background:#2ecc71; color:white; margin-left:10px;">MOST SUITABLE</span>' : ''}
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 700; color: #2ecc71;">${rec.suitability}% Match</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Realistic Probability</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 8px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
+                                <div style="height: 100%; width: ${rec.suitability}%; background: #2ecc71; border-radius: 2px;"></div>
+                            </div>
+                        </div>
+                    `).join('');
+
+
+                    if(data.recommendations && data.recommendations.length > 0) {
+                        selectCrop(data.recommendations[0].crop, data.recommendations[0].suitability);
+                    }
+                    
+                    resultsPanel.style.display = 'block';
+                    resultsPanel.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    errorPanel.innerText = `⚠️ ${data.error}`;
+                    errorPanel.style.display = 'block';
+                    errorPanel.scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch(err) {
+                console.error("Prediction failed", err);
+                errorPanel.innerText = "⚠️ Connection error. Please try again.";
+                errorPanel.style.display = 'block';
+            } finally {
+                btn.innerText = 'Predict Best Crop & Yield';
+                btn.disabled = false;
+            }
+        }
+
+        let selectedCropForListing = null;
+
+        function selectCrop(crop, suitability, element) {
+            selectedCropForListing = crop;
+            if (typeof updateCropVulnerabilityNotice === 'function') {
+                updateCropVulnerabilityNotice(crop);
+            }
+            // Visual feedback
+            document.querySelectorAll('.recommendation-item').forEach(el => el.classList.remove('selected'));
+            if(element) element.classList.add('selected');
+            else {
+                // Fallback if element is not passed (e.g. initial recommendation)
+                const items = document.querySelectorAll('.recommendation-item');
+                for(let item of items) {
+                    if(item.innerText.includes(crop)) {
+                        item.classList.add('selected');
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        function setToList() {
+            const yieldVal = document.getElementById('yield-result').innerText.split(' ')[0];
+            
+            // 1. Determine which crop to use
+            let cropToSet = selectedCropForListing;
+            
+            if(!cropToSet) {
+                // If user didn't click one, pick the first (most suitable) recommendation automatically
+                const firstRec = document.querySelector('.recommendation-item');
+                if(firstRec) {
+                    cropToSet = firstRec.getAttribute('data-crop');
+                    // Visually select it too
+                    selectCrop(cropToSet, firstRec.getAttribute('data-suitability'), firstRec);
+                }
+            }
+
+            // 2. Transfer to listing form
+            if(cropToSet && yieldVal && yieldVal !== '--') {
+                document.getElementById('m-crop').value = cropToSet;
+                document.getElementById('m-quantity').value = yieldVal;
+                document.getElementById('m-price').value = 25000; // Consistent default pricing
+                
+                // 3. UX: Scroll and Highlight
+                document.getElementById('listing-panel').scrollIntoView({ behavior: 'smooth' });
+                const panel = document.getElementById('listing-panel');
+                panel.style.boxShadow = '0 0 25px rgba(46, 204, 113, 0.4)';
+                setTimeout(() => panel.style.boxShadow = '', 2000);
+            } else {
+                alert("Please perform a prediction first to get crop recommendations!");
+            }
+        }
+
+        async function postListing(e) {
+            e.preventDefault();
+            const user = getUser();
+            if(!user) return;
+
+            const formData = {
+                farmer_id: user.id,
+                crop_name: document.getElementById('m-crop').value,
+                quantity_tons: document.getElementById('m-quantity').value,
+                price_per_ton: document.getElementById('m-price').value
+            };
+
+            try {
+                const res = await fetch('/api/marketplace', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                if(res.ok) {
+                    alert("Crop listed successfully!");
+                    e.target.reset();
+                    loadMyListings();
+                } else {
+                    const data = await res.json();
+                    alert("Error: " + data.error);
+                }
+            } catch(err) {
+                console.error("Listing failed", err);
+            }
+        }
+
+        async function loadOrders() {
+            const user = getUser();
+            const container = document.getElementById('orders-container');
+            try {
+                const res = await fetch(`/api/user/orders?user_id=${user.id}&role=${user.role}`);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                const orders = await res.json();
+                
+                if(orders.length === 0) {
+                    container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-secondary);">No orders ${user.role === 'Farmer' ? 'to fulfill' : 'placed'} yet.</p>`;
+                    return;
+                }
+                
+                container.innerHTML = '';
+                orders.forEach(o => {
+                    const isDefault = o.status === 'Paid_OrderPlaced' || o.status === 'Interested';
+                    const statusVal = o.status === 'Finalized' ? 100 : (o.status === 'SCM_Managed' ? 66 : 33);
+                    const statusColor = o.status === 'Finalized' ? '#2ecc71' : (o.status === 'SCM_Managed' ? '#f39c12' : '#3498db');
+                    
+                    const div = document.createElement('div');
+                    div.style = "background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);";
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.95rem;">${o.crop_name}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-secondary);">${user.role === 'Farmer' ? 'Buyer' : 'Seller'}: ${o.partner_name}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: ${statusColor}; font-size: 0.8rem;">${o.status.replace('_', ' ')}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-secondary);">₹${o.total_price.toLocaleString('en-IN')}</div>
+                            </div>
+                        </div>
+                        <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+                            <div style="height: 100%; width: ${statusVal}%; background: ${statusColor}; transition: width 1s ease;"></div>
+                        </div>
+                        <div style="display:flex; justify-content: space-between; margin-top: 8px; font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                            <span>Placed</span>
+                            <span style="${statusVal >= 66 ? 'color:white' : ''}">SCM</span>
+                            <span style="${statusVal === 100 ? 'color:white' : ''}">Final</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch(err) {
+                console.error("Error loading orders", err);
+                container.innerHTML = `<p style="font-size: 0.8rem; color: #e74c3c;">Failed to load order data. Please try again.</p>`;
+            }
+        }
+
+        async function loadMyListings() {
+
+            const user = getUser();
+            const container = document.getElementById('my-listings-container');
+            try {
+                const res = await fetch(`/api/my_listings?farmer_id=${user.id}`);
+                const listings = await res.json();
+                
+                if(listings.length === 0) {
+                    container.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-secondary);">No listings yet. Predict and list your crops!</p>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                listings.forEach(l => {
+                    const div = document.createElement('div');
+                    div.style = "background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary-green);";
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600;">${l.crop_name}</span>
+                            <span class="tag" style="background: rgba(46, 204, 113, 0.2); color: #2ecc71;">${l.status}</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 5px;">
+                            ${l.quantity_tons} Tons @ ₹${l.price_per_ton}/Ton
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch(err) {
+                console.error("Error loading listings", err);
+            }
+        }
+
+        // ===== CNN Crop Disease Classifier Functions =====
+        const CROP_PATHOLOGY_DB = {
+            'Rice': {
+                disease: 'Rice Blast (Pyricularia oryzae) & Bacterial Leaf Blight',
+                symptoms: 'Spindle-shaped leaf spots and water-soaked streaks',
+                remedy: 'Apply Tricyclazole (75 WP @ 0.6g/L) or Copper Oxychloride spray.'
+            },
+            'Wheat': {
+                disease: 'Wheat Leaf Rust (Puccinia triticina) & Powdery Mildew',
+                symptoms: 'Orange-brown leaf pustules and white powdery coating',
+                remedy: 'Spray Propiconazole (Tilt 25 EC @ 1ml/L) at first symptom.'
+            },
+            'Maize': {
+                disease: 'Turcicum Leaf Blight & Common Rust',
+                symptoms: 'Long elliptical grey-brown lesions and reddish spots',
+                remedy: 'Spray Mancozeb (2.5g/L) or Chlorothalonil fungicide.'
+            },
+            'Sugarcane': {
+                disease: 'Sugarcane Red Rot & Smut',
+                symptoms: 'Red inner stalk discoloration and black whip structures',
+                remedy: 'Use disease-free setts treated with Carbendazim (0.1%).'
+            },
+            'Cotton': {
+                disease: 'Cotton Bacterial Blight & Leaf Curl Virus',
+                symptoms: 'Angular water-soaked leaf spots and leaf curling',
+                remedy: 'Spray Streptocycline (0.1g/L) with Copper Oxychloride (2.5g/L).'
+            },
+            'Cotton(lint)': {
+                disease: 'Cotton Bacterial Blight & Leaf Curl Virus',
+                symptoms: 'Angular water-soaked leaf spots and vein thickening',
+                remedy: 'Spray Streptocycline (0.1g/L) with Copper Oxychloride (2.5g/L).'
+            },
+            'Jute': {
+                disease: 'Jute Stem Rot (Macrophomina) & Yellow Mite Blight',
+                symptoms: 'Black lesions on lower stem and leaf drop',
+                remedy: 'Apply Carbendazim (1g/L) drench and maintain drainage.'
+            },
+            'Groundnut': {
+                disease: 'Tikka Leaf Spot (Cercospora) & Collar Rot',
+                symptoms: 'Dark brown circular spots with yellow halos',
+                remedy: 'Spray Mancozeb (2g/L) or Hexaconazole (1ml/L).'
+            },
+            'Rapeseed &Mustard': {
+                disease: 'Mustard White Rust (Albugo) & Alternaria Blight',
+                symptoms: 'White shiny leaf pustules and concentric brown spots',
+                remedy: 'Spray Metalaxyl + Mancozeb (Ridomil 2g/L) at bloom.'
+            },
+            'Sunflower': {
+                disease: 'Sunflower Alternaria Blight & Rust',
+                symptoms: 'Dark brown necrotic spots on leaves and seed heads',
+                remedy: 'Spray Mancozeb (2g/L) or Difenoconazole (1ml/L).'
+            },
+            'Soyabean': {
+                disease: 'Soybean Yellow Mosaic Virus & Asian Soybean Rust',
+                symptoms: 'Alternating yellow and green mottling on leaves',
+                remedy: 'Control whitefly vector with Imidacloprid (0.5ml/L).'
+            },
+            'Potato': {
+                disease: 'Potato Late Blight (Phytophthora) & Early Blight',
+                symptoms: 'Water-soaked black leaf margins with white fungal rot',
+                remedy: 'Spray Cymoxanil + Mancozeb or Metalaxyl immediately.'
+            },
+            'Onion': {
+                disease: 'Onion Purple Blotch (Alternaria porri) & Downy Mildew',
+                symptoms: 'Sunken purple lesions on leaves turning dark brown',
+                remedy: 'Spray Mancozeb (2.5g/L) or Tebuconazole (1ml/L).'
+            },
+            'Dry chillies': {
+                disease: 'Chilli Anthracnose (Die-back) & Leaf Curl Virus',
+                symptoms: 'Necrotic dark spots on fruit and downward leaf twisting',
+                remedy: 'Spray Azoxystrobin (1ml/L) or Copper Hydroxide.'
+            },
+            'Turmeric': {
+                disease: 'Turmeric Leaf Spot (Taphrina) & Rhizome Rot',
+                symptoms: 'Yellow reddish-brown spots on leaf surfaces',
+                remedy: 'Spray Carbendazim (1g/L) or Bordeaux Mixture (1%).'
+            },
+            'Ginger': {
+                disease: 'Ginger Soft Rot (Pythium) & Bacterial Wilt',
+                symptoms: 'Water-soaked yellowing of lower leaves and collar rot',
+                remedy: 'Drench soil with Trichoderma viride or Metalaxyl (2g/L).'
+            },
+            'Garlic': {
+                disease: 'Garlic Purple Blotch & Stemphylium Blight',
+                symptoms: 'Small white spots developing into purple leaf streaks',
+                remedy: 'Spray Mancozeb (2.5g/L) or Propiconazole (1ml/L).'
+            },
+            'Banana': {
+                disease: 'Banana Sigatoka Leaf Spot & Panama Wilt',
+                symptoms: 'Yellowish-green streaks developing into dark brown leaf spots',
+                remedy: 'Spray Mineral Oil + Propiconazole (1ml/L).'
+            },
+            'Arecanut': {
+                disease: 'Arecanut Koleroga (Fruit Rot) & Yellow Leaf Disease',
+                symptoms: 'Water-soaked dark green patches causing nut rot and drop',
+                remedy: 'Spray Bordeaux Mixture (1%) before monsoon.'
+            },
+            'Black pepper': {
+                disease: 'Black Pepper Quick Wilt (Foot Rot - Phytophthora)',
+                symptoms: 'Dark water-soaked leaf spots and vine collar decay',
+                remedy: 'Apply Potassium Phosphonate (3ml/L) soil drenching.'
+            },
+            'Cardamom': {
+                disease: 'Cardamom Katte Mosaic Virus & Rhizome Rot',
+                symptoms: 'Continuous green streaks along leaf veins',
+                remedy: 'Remove vector aphids with Neem oil or Imidacloprid.'
+            },
+            'Cashewnut': {
+                disease: 'Cashew Anthracnose & Tea Mosquito Bug Blight',
+                symptoms: 'Scorching of tender shoots and reddish leaf spots',
+                remedy: 'Spray Carbendazim (1g/L) + Lambda Cyhalothrin.'
+            },
+            'Tobacco': {
+                disease: 'Tobacco Frog Eye Leaf Spot & Mosaic Virus',
+                symptoms: 'Small parchment-like tan spots with dark margins',
+                remedy: 'Spray Chlorothalonil (2g/L) and remove infected leaves.'
+            },
+            'Bajra': {
+                disease: 'Bajra Downy Mildew (Green Ear) & Ergot',
+                symptoms: 'Conversion of earheads to green leafy structures',
+                remedy: 'Seed treatment with Metalaxyl (35 SD @ 6g/kg).'
+            },
+            'Jowar': {
+                disease: 'Sorghum Grain Smut & Anthracnose Spot',
+                symptoms: 'Conversion of grains into dark grey fungal sori',
+                remedy: 'Treat seeds with Thiram (3g/kg) before sowing.'
+            },
+            'Ragi': {
+                disease: 'Ragi Blast (Pyricularia eleusinis) & Foot Rot',
+                symptoms: 'Spindle-shaped brown lesions on leaves and neck rot',
+                remedy: 'Spray Tricyclazole (0.6g/L) or Kitazin (1ml/L).'
+            },
+            'Gram': {
+                disease: 'Chickpea Ascochyta Blight & Fusarium Wilt',
+                symptoms: 'Circular brown leaf spots with dark concentric rings',
+                remedy: 'Seed treatment with Carbendazim + Thiram (3g/kg).'
+            },
+            'Arhar/Tur': {
+                disease: 'Pigeonpea Sterility Mosaic & Fusarium Wilt',
+                symptoms: 'Bushy pale green leaves without flowering/fruiting',
+                remedy: 'Control eriophyid mite vector with Fenazaquin spray.'
+            },
+            'Moong(Green Gram)': {
+                disease: 'Green Gram Yellow Mosaic Virus & Cercospora Spot',
+                symptoms: 'Bright yellow patches on leaves expanding rapidly',
+                remedy: 'Spray Triazophos (2ml/L) to manage vector whiteflies.'
+            },
+            'Urad': {
+                disease: 'Black Gram Powdery Mildew & Yellow Mosaic Virus',
+                symptoms: 'White flour-like powdery patches on upper leaf surfaces',
+                remedy: 'Spray Soluble Sulphur (3g/L) or Dinocap.'
+            },
+            'Sesame': {
+                disease: 'Sesame Phyllody Disease & Alternaria Spot',
+                symptoms: 'Floral parts converted into green leaf-like structures',
+                remedy: 'Control leafhopper vectors with Oxydemeton-methyl.'
+            }
+        };
+
+        let currentCnnLang = 'en';
+
+        const LANG_UI = {
+            'en': {
+                title: '🔬 CNN Crop Disease Classifier',
+                subtitle: 'Upload or drag a leaf photo to diagnose diseases using our trained Deep Learning Convolutional Neural Network (CNN).',
+                cropLabel: '🌱 Select Crop to Check Disease Vulnerability (for Selected State)',
+                uploadLabel: 'Select or Drop Leaf Image (JPG/PNG)',
+                scanBtn: '🔬 Scan Crop Leaf with CNN AI',
+                confidence: 'CNN Confidence Score:',
+                treatment: '💊 Recommended Treatment Advice:'
+            },
+            'hi': {
+                title: '🔬 सीएनएन फसल रोग निदान (CNN Disease Classifier)',
+                subtitle: 'प्रशिक्षित डीप लर्निंग सीएनएन (CNN) मॉडल द्वारा पत्तियों के रोगों का निदान करने के लिए फोटो अपलोड करें।',
+                cropLabel: '🌱 चयनित राज्य के लिए फसल रोग जोखिम देखें',
+                uploadLabel: 'पत्ती की फोटो चुनें या ड्रैग करें (JPG/PNG)',
+                scanBtn: '🔬 सीएनएन एआई से पत्ती की जांच करें',
+                confidence: 'सीएनएन विश्वास स्कोर (Confidence Score):',
+                treatment: '💊 अनुशंसित उपचार सलाह (Recommended Treatment):'
+            },
+            'mr': {
+                title: '🔬 सीएनएन पीक रोग निदान (CNN Disease Classifier)',
+                subtitle: 'पिकांच्या पानांवरील रोगांचे निदान करण्यासाठी सीएनएन (CNN) एआय वापरून फोटो अपलोड करा.',
+                cropLabel: '🌱 निवडलेल्या राज्यासाठी पीक रोग धोका तपासा',
+                uploadLabel: 'पानाचा फोटो निवडा किंवा ड्रॅग करा (JPG/PNG)',
+                scanBtn: '🔬 सीएनएन एआय द्वारे पानांची तपासणी करा',
+                confidence: 'सीएनएन विश्वास गुणसंख्या (Confidence Score):',
+                treatment: '💊 शिफारस केलेला उपचार सल्ला:'
+            },
+            'gu': {
+                title: '🔬 સીએનએન પાક રોગ નિદાન (CNN Disease Classifier)',
+                subtitle: 'પાકના પાંદડાના રોગોનું નિદાન કરવા માટે સીએનએન (CNN) એઆઈ મોડેલનો ઉપયોગ કરી ફોટો અપલોડ કરો.',
+                cropLabel: '🌱 પસંદ કરેલ રાજ્ય માટે પાક રોગ જોખમ જુઓ',
+                uploadLabel: 'પાંદડાનો ફોટો પસંદ કરો અથવા ડ્રેગ કરો (JPG/PNG)',
+                scanBtn: '🔬 સીએનએન એઆઈ દ્વારા પાંદડાની તપાસ કરો',
+                confidence: 'સીએનએન વિશ્વાસ સ્કોર (Confidence Score):',
+                treatment: '💊 ભલામણ કરેલ સારવાર સલાહ:'
+            },
+            'pa': {
+                title: '🔬 ਸੀਐਨਐਨ ਫਸਲ ਬਿਮਾਰੀ ਨਿਦਾਨ (CNN Disease Classifier)',
+                subtitle: 'ਫਸਲ ਦੇ ਪੱਤਿਆਂ ਦੀਆਂ ਬਿਮਾਰੀਆਂ ਦੀ ਪਛਾਣ ਲਈ ਸੀਐਨਐਨ (CNN) ਏਆਈ ਮਾਡਲ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਫੋਟੋ ਅਪਲੋਡ ਕਰੋ।',
+                cropLabel: '🌱 ਚੁਣੇ ਰਾਜ ਲਈ ਫਸਲ ਬਿਮਾਰੀ ਖਤਰਾ ਦੇਖੋ',
+                uploadLabel: 'ਪੱਤੇ ਦੀ ਫੋਟੋ ਚੁਣੋ ਜਾਂ ਡਰੈਗ ਕਰੋ (JPG/PNG)',
+                scanBtn: '🔬 ਸੀਐਨਐਨ ਏਆਈ ਨਾਲ ਪੱਤੇ ਦੀ ਜਾਂਚ ਕਰੋ',
+                confidence: 'ਸੀਐਨਐਨ ਵਿਸ਼ਵਾਸ ਸਕੋਰ (Confidence Score):',
+                treatment: '💊 ਸਿਫਾਰਸ਼ ਕੀਤੀ ਇਲਾਜ ਸਲਾਹ:'
+            },
+            'ta': {
+                title: '🔬 சிஎன்என் பயிர் நோய் கண்டறிதல் (CNN Disease Classifier)',
+                subtitle: 'பயிர் இலை நோய்களை கண்டறிய சிஎன்என் (CNN) AI மாடலைப் பயன்படுத்தி புகைப்படத்தைப் பதிவேற்றவும்.',
+                cropLabel: '🌱 தேர்ந்தெடுக்கப்பட்ட மாநிலத்திற்கான பயிர் நோய் ஆபத்தைப் பார்க்கவும்',
+                uploadLabel: 'இலை புகைப்படத்தைத் தேர்ந்தெடுக்கவும் (JPG/PNG)',
+                scanBtn: '🔬 சிஎன்என் AI மூலம் இலையை ஸ்கேன் செய்யவும்',
+                confidence: 'சிஎன்என் நம்பிக்கை மதிப்பெண் (Confidence Score):',
+                treatment: '💊 பரிந்துரைக்கப்பட்ட சிகிச்சை ஆலோசனை:'
+            },
+            'te': {
+                title: '🔬 సీఎన్‌ఎన్ పంట వ్యాధి నిర్ధారణ (CNN Disease Classifier)',
+                subtitle: 'పంట ఆకుల వ్యాధులను నిర్ధారించడానికి సీఎన్‌ఎన్ (CNN) AI మోడల్‌ను ఉపయోగించి ఫోటోను అప్‌లోడ్ చేయండి.',
+                cropLabel: '🌱 ఎంచుకున్న రాష్ట్రం కోసం పంట వ్యాధి ప్రమాదాన్ని చూడండి',
+                uploadLabel: 'ఆకు ఫోటోను ఎంచుకోండి లేదా డ్రాగ్ చేయండి (JPG/PNG)',
+                scanBtn: '🔬 సీఎన్‌ఎన్ AI ద్వారా ఆకును స్కాన్ చేయండి',
+                confidence: 'సీఎన్‌ఎన్ విశ్వసనీయత స్కోర్ (Confidence Score):',
+                treatment: '💊 సిఫార్సు చేసిన చికిత్స సలహా:'
+            },
+            'bn': {
+                title: '🔬 সিএনএন শস্য রোগ নির্ণয় (CNN Disease Classifier)',
+                subtitle: 'গাছের পাতার রোগ নির্ণয়ের জন্য আমাদের সিএনএন (CNN) এআই মডেল ব্যবহার করে ফটো আপলোড করুন।',
+                cropLabel: '🌱 নির্বাচিত রাজ্যের জন্য শস্য রোগের ঝুঁকি দেখুন',
+                uploadLabel: 'পাতার ছবি নির্বাচন করুন বা ড্র্যাগ করুন (JPG/PNG)',
+                scanBtn: '🔬 সিএনএন এআই দিয়ে পাতা পরীক্ষা করুন',
+                confidence: 'সিএনএন আত্মবিশ্বাসের স্কোর (Confidence Score):',
+                treatment: '💊 প্রস্তাবিত চিকিৎসা পরামর্শ:'
+            }
+        };
+
+        const REGIONAL_CROP_NAMES = {
+            'hi': { 'Rice': 'चावल (धान)', 'Wheat': 'गेहूं', 'Maize': 'मक्का', 'Sugarcane': 'गन्ना', 'Cotton': 'कपास', 'Cotton(lint)': 'कपास', 'Potato': 'आलू', 'Onion': 'प्याज़', 'Groundnut': 'मूंगफली', 'Soyabean': 'सोयाबीन' },
+            'mr': { 'Rice': 'तांदूळ (भात)', 'Wheat': 'गहू', 'Maize': 'मका', 'Sugarcane': 'ऊसाचा पीक', 'Cotton': 'कापूस', 'Cotton(lint)': 'कापूस', 'Potato': 'बटाटा', 'Onion': 'कांदा', 'Groundnut': 'भुईमूग', 'Soyabean': 'सोयाबीन' },
+            'gu': { 'Rice': 'ચોખા (ડાંગર)', 'Wheat': 'ઘઉં', 'Maize': 'મકાઈ', 'Sugarcane': 'શેરડી', 'Cotton': 'કપાસ', 'Cotton(lint)': 'કપાસ', 'Potato': 'બટાકા', 'Onion': 'ડુંગળી', 'Groundnut': 'મગફળી', 'Soyabean': 'સોયાબીન' },
+            'pa': { 'Rice': 'ਝੋਨਾ (ਚਾਵਲ)', 'Wheat': 'ਕਣਕ', 'Maize': 'ਮੱਕੀ', 'Sugarcane': 'ਗੰਨਾ', 'Cotton': 'ਕਪਾਹ', 'Cotton(lint)': 'ਕਪਾਹ', 'Potato': 'ਆਲੂ', 'Onion': 'ਗੰਢਾ', 'Groundnut': 'ਮੂੰਗਫਲੀ', 'Soyabean': 'ਸੋਇਆਬੀਨ' },
+            'ta': { 'Rice': 'அரிசி (நெல்)', 'Wheat': 'கோதுமை', 'Maize': 'சோளம்', 'Sugarcane': 'கரும்பு', 'Cotton': 'பருத்தி', 'Cotton(lint)': 'பருத்தி', 'Potato': 'உருளைக்கிழங்கு', 'Onion': 'வெங்காயம்', 'Groundnut': 'நிலக்கடலை', 'Soyabean': 'சோயாபீன்' },
+            'te': { 'Rice': 'వరి (బియ్యం)', 'Wheat': 'గోధుమ', 'Maize': 'జొన్న/మొక్కజొన్న', 'Sugarcane': 'చెరకు', 'Cotton': 'పత్తి', 'Cotton(lint)': 'పత్తి', 'Potato': 'బంగాళాదుంప', 'Onion': 'ఉల్లిపాయ', 'Groundnut': 'వేరుశనగ', 'Soyabean': 'సోయాబీన్' },
+            'bn': { 'Rice': 'ধান (চাল)', 'Wheat': 'গম', 'Maize': 'ভুট্টা', 'Sugarcane': 'আখ', 'Cotton': 'তুলা', 'Cotton(lint)': 'তুলা', 'Potato': 'আলু', 'Onion': 'পেঁয়াজ', 'Groundnut': 'চীনাবাদাম', 'Soyabean': 'সোয়াবিন' }
+        };
+
+        const REGIONAL_LABELS = {
+            'en': {
+                title: (crop, state) => `Pre-Predicted Disease Vulnerability for ${crop} in ${state}`,
+                desc: (state, crop, disease, symptoms, remedy) => `Based on your selected state (<strong>${state}</strong>) and crop (<strong>${crop}</strong>), the primary predicted disease risk for this region & climate is <strong>${disease}</strong>.<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 Key Symptoms: ${symptoms} | 💊 Recommended Treatment: ${remedy}</span>`
+            },
+            'hi': {
+                title: (crop, state) => `${state} में ${crop} के लिए पूर्व-अनुमानित रोग जोखिम`,
+                desc: (state, crop, disease, symptoms, remedy) => `आपके चयनित राज्य (<strong>${state}</strong>) और फसल (<strong>${crop}</strong>) के आधार पर प्राथमिक अनुमानित रोग जोखिम <strong>${disease}</strong> है।<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 मुख्य लक्षण: ${symptoms} | 💊 अनुशंसित उपचार: ${remedy}</span>`
+            },
+            'mr': {
+                title: (crop, state) => `${state} मध्ये ${crop} साठी पूर्व-अंदाजित रोग धोका`,
+                desc: (state, crop, disease, symptoms, remedy) => `तुमच्या निवडलेल्या राज्यानुसार (<strong>${state}</strong>) आणि पिकासाठी (<strong>${crop}</strong>) प्राथमिक रोगाचा धोका <strong>${disease}</strong> आहे.<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 मुख्य लक्षणे: ${symptoms} | 💊 शिफारस केलेला उपचार: ${remedy}</span>`
+            },
+            'gu': {
+                title: (crop, state) => `${state} માં ${crop} માટે પૂર્વ-અનુમાનિત રોગ જોખમ`,
+                desc: (state, crop, disease, symptoms, remedy) => `તમારા પસંદ કરેલ રાજ્ય (<strong>${state}</strong>) અને પાક (<strong>${crop}</strong>) મુજબ પ્રાથમિક રોગ જોખમ <strong>${disease}</strong> છે.<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 મુખ્ય લક્ષણો: ${symptoms} | 💊 ભલામણ કરેલ સારવાર: ${remedy}</span>`
+            },
+            'pa': {
+                title: (crop, state) => `${state} ਵਿੱਚ ${crop} ਲਈ ਪੂਰਵ-ਅਨੁਮਾਨਿਤ ਬਿਮਾਰੀ ਖਤਰਾ`,
+                desc: (state, crop, disease, symptoms, remedy) => `ਤੁਹਾਡੇ ਚੁਣੇ ਰਾਜ (<strong>${state}</strong>) ਅਤੇ ਫਸਲ (<strong>${crop}</strong>) ਦੇ ਆਧਾਰ ਤੇ ਬਿਮਾਰੀ ਖਤਰਾ <strong>${disease}</strong> ਹੈ।<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 ਮੁੱਖ ਲੱਛਣ: ${symptoms} | 💊 ਸਿਫਾਰਸ਼ ਕੀਤਾ ਇਲਾਜ: ${remedy}</span>`
+            },
+            'ta': {
+                title: (crop, state) => `${state} இல் ${crop} க்கான முன் கணிக்கப்பட்ட நோய் ஆபத்து`,
+                desc: (state, crop, disease, symptoms, remedy) => `நீங்கள் தேர்ந்தெடுத்த மாநிலம் (<strong>${state}</strong>) மற்றும் பயிர் (<strong>${crop}</strong>) அடிப்படையில் முதன்மை நோய் ஆபத்து <strong>${disease}</strong> ஆகும்.<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 முக்கிய அறிகுறிகள்: ${symptoms} | 💊 பரிந்துரைக்கப்பட்ட சிகிச்சை: ${remedy}</span>`
+            },
+            'te': {
+                title: (crop, state) => `${state} లో ${crop} కోసం ముందస్తు వ్యాధి ప్రమాదం`,
+                desc: (state, crop, disease, symptoms, remedy) => `మీరు ఎంచుకున్న రాష్ట్రం (<strong>${state}</strong>) మరియు పంట (<strong>${crop}</strong>) ఆధారంగా ప్రాథమిక వ్యాధి ప్రమాదం <strong>${disease}</strong>.<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 ముఖ్య లక్షణాలు: ${symptoms} | 💊 సిఫార్సు చేసిన చికిత్స: ${remedy}</span>`
+            },
+            'bn': {
+                title: (crop, state) => `${state} এ ${crop} এর জন্য পূর্ব-অনুমানকৃত রোগের ঝুঁকি`,
+                desc: (state, crop, disease, symptoms, remedy) => `আপনার নির্বাচিত রাজ্য (<strong>${state}</strong>) এবং শস্য (<strong>${crop}</strong>) এর ওপর ভিত্তি করে প্রাথমিক রোগের ঝুঁকি <strong>${disease}</strong>।<br><span style="font-size:0.78rem; color:#b8e994; margin-top:5px; display:inline-block;">🔍 প্রধান লক্ষণ: ${symptoms} | 💊 প্রস্তাবিত চিকিৎসা: ${remedy}</span>`
+            }
+        };
+
+        function changeCnnLanguage(langCode) {
+            currentCnnLang = langCode || 'en';
+            const ui = LANG_UI[currentCnnLang] || LANG_UI['en'];
+
+            const titleEl = document.getElementById('cnn-panel-title');
+            const subtitleEl = document.getElementById('cnn-panel-subtitle');
+            const cropLabelEl = document.getElementById('cnn-crop-label');
+            const uploadLabelEl = document.getElementById('cnn-upload-label');
+            const btnEl = document.getElementById('disease-btn');
+            const confLabelEl = document.getElementById('cnn-confidence-label');
+            const treatLabelEl = document.getElementById('cnn-treatment-label');
+
+            if (titleEl) titleEl.innerHTML = ui.title;
+            if (subtitleEl) subtitleEl.innerText = ui.subtitle;
+            if (cropLabelEl) cropLabelEl.innerText = ui.cropLabel;
+            if (uploadLabelEl) uploadLabelEl.innerText = ui.uploadLabel;
+            if (btnEl) btnEl.innerText = ui.scanBtn;
+            if (confLabelEl) confLabelEl.innerText = ui.confidence;
+            if (treatLabelEl) treatLabelEl.innerText = ui.treatment;
+
+            const currentCrop = document.getElementById('cnn_crop_select') ? document.getElementById('cnn_crop_select').value : 'Rice';
+            updateCropVulnerabilityNotice(currentCrop);
+        }
+
+        function onCnnCropChange(cropName) {
+            const yieldSelect = document.getElementById('crop_for_yield');
+            if (yieldSelect) yieldSelect.value = cropName;
+            updateCropVulnerabilityNotice(cropName);
+        }
+
+        function updateCropVulnerabilityNotice(cropName) {
+            if (!cropName) cropName = document.getElementById('cnn_crop_select') ? document.getElementById('cnn_crop_select').value : 'Rice';
+            const state = document.getElementById('state') ? document.getElementById('state').value : 'Maharashtra';
+
+            // Auto-sync CNN crop dropdown selector
+            const cnnSelect = document.getElementById('cnn_crop_select');
+            if (cnnSelect && cnnSelect.value !== cropName) {
+                cnnSelect.value = cropName;
+            }
+
+            const info = CROP_PATHOLOGY_DB[cropName] || {
+                disease: `${cropName} Leaf Spot & Blight`,
+                symptoms: 'Fungal leaf discoloration and brown spots',
+                remedy: 'Apply broad-spectrum Mancozeb (2.5g/L) fungicide spray.'
+            };
+
+            const lang = currentCnnLang || 'en';
+            const langObj = REGIONAL_LABELS[lang] || REGIONAL_LABELS['en'];
+            const cropDict = REGIONAL_CROP_NAMES[lang] || {};
+            const displayCrop = cropDict[cropName] || cropName;
+
+            const titleEl = document.getElementById('vulnerability-crop-title');
+            const descEl = document.getElementById('vulnerability-desc');
+
+            if (titleEl) {
+                titleEl.innerText = langObj.title(displayCrop, state);
+            }
+            if (descEl) {
+                descEl.innerHTML = langObj.desc(state, displayCrop, info.disease, info.symptoms, info.remedy);
+            }
+        }
+
+        function previewDiseaseImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('disease-preview-img').src = evt.target.result;
+                    document.getElementById('disease-preview-container').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function analyzeDisease(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('disease-file');
+            if (!fileInput.files || fileInput.files.length === 0) return;
+
+            const btn = document.getElementById('disease-btn');
+            const resultPanel = document.getElementById('disease-result-panel');
+            const user = getUser();
+
+            btn.innerText = 'Analyzing Leaf Patterns with CNN...';
+            btn.disabled = true;
+            resultPanel.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            if (user && user.id) formData.append('user_id', user.id);
+
+            try {
+                const res = await fetch('/api/predict-disease', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById('disease-name').innerText = `Diagnosis: ${data.disease}`;
+                    document.getElementById('disease-confidence').innerText = `${data.confidence}%`;
+                    document.getElementById('disease-confidence-bar').style.width = `${Math.min(100, data.confidence || 75)}%`;
+                    document.getElementById('disease-treatment').innerText = data.treatment;
+
+                    const sevTag = document.getElementById('disease-severity-tag');
+                    sevTag.innerText = `Severity: ${data.severity || 'Moderate'}`;
+                    if (data.severity === 'Severe' || data.severity === 'High') {
+                        sevTag.style.background = 'rgba(231, 76, 60, 0.2)';
+                        sevTag.style.color = '#e74c3c';
+                    } else if (data.severity === 'None') {
+                        sevTag.style.background = 'rgba(46, 204, 113, 0.2)';
+                        sevTag.style.color = '#2ecc71';
+                    } else {
+                        sevTag.style.background = 'rgba(241, 196, 15, 0.2)';
+                        sevTag.style.color = '#f1c40f';
+                    }
+
+                    resultPanel.style.display = 'block';
+                    resultPanel.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch(err) {
+                console.error('Disease prediction error:', err);
+                alert('⚠️ Disease analysis failed. Please try again.');
+            } finally {
+                btn.innerText = '🔬 Scan Crop Leaf with CNN AI';
+                btn.disabled = false;
+            }
+        }
+    </script>
+
+    {% include 'chatbot_widget.html' %}
+</body>
+</html>

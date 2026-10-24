@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Marketplace - AgriPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 9L3 22H21L21 9L12 2Z" fill="#2ecc71" opacity="0.3"/>
+                <path d="M12 5V22M12 12C9 12 7 9 7 9C7 9 9 6 12 6C15 6 17 9 17 9C17 9 15 12 12 12Z" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <a href="/">AgriPredict</a>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/marketplace" class="active" style="color:var(--primary-green)">Marketplace</a>
+        </div>
+        <div>
+            <button class="btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="margin-bottom: 10px;">Marketplace</h1>
+        <p style="color: var(--text-secondary);">Direct connections between Farmers and Vendors.</p>
+        
+        <div class="marketplace-grid" id="marketplace-grid" style="margin-top: 40px;">
+            <!-- Listings injected here via JS -->
+            <p style="color:var(--text-secondary)">Loading listings...</p>
+        </div>
+    </div>
+
+    <!-- Deal Status Modal -->
+    <div class="modal" id="dealModal">
+        <div class="modal-content glass-panel" style="text-align: center;">
+            <span class="close-btn" onclick="closeDealModal()">&times;</span>
+            <div style="font-size: 3rem; margin-bottom: 20px;">📦</div>
+            <h2 style="margin-bottom:10px; color:var(--primary-green)">Order Placed Successfully!</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Your order has been recorded in the AgriPredict SCM system.
+            </p>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; font-size: 0.9rem;">
+                <strong>Next Step</strong>: The System Admin will manage the logistics and delivery. You will receive updates via email.
+            </div>
+            <button class="btn-primary" style="margin-top: 25px; width: 100%;" onclick="closeDealModal()">Finalize & Close</button>
+        </div>
+    </div>
+
+    <!-- ePayment Gateway Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content glass-panel" style="max-width: 450px; padding: 0; overflow: hidden; border: 1px solid rgba(46, 204, 113, 0.3);">
+            <div style="background: var(--primary-green); padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: 700; letter-spacing: 1px;">SECURE CHECKOUT</div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo.png" alt="UPI" style="height: 20px; filter: brightness(0) invert(1);">
+            </div>
+            <div style="padding: 20px 30px;">
+                <div style="margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                    <label style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 5px;">Quantity to Purchase (Tons)</label>
+                    <input type="number" id="purchase-qty" class="form-control" style="font-size: 1.2rem; font-weight: 700; background: transparent; border: none; padding: 0;" value="1" min="1" oninput="updateTotal()">
+                    <p style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 5px;">Max available: <span id="max-available">0</span> Tons</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                    <div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Amount to Pay</div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: white;" id="pay-amount">₹0.00</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Order ID</div>
+                        <div style="font-size: 0.9rem; color: white;" id="pay-orderid">#AP-9923</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px;">Select Payment Method</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="payment-option selected" onclick="selectPay(this, 'upi')">
+                            <span>📱 UPI (GPay, PhonePe, Bhim)</span>
+                            <div class="radio-circle"></div>
+                        </div>
+                        <div id="upi-fields" class="payment-fields" style="display: block;">
+                            <input type="text" class="form-control" placeholder="Enter UPI ID (e.g. user@okaxis)" id="upi-id">
+                            <p style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 5px;">Dummy Hint: <strong>agri@upi</strong></p>
+                        </div>
+
+                        <div class="payment-option" onclick="selectPay(this, 'card')">
+                            <span>💳 Credit / Debit Card</span>
+                            <div class="radio-circle"></div>
+                        </div>
+                        <div id="card-fields" class="payment-fields" style="display: none;">
+                            <input type="text" class="form-control" placeholder="Card Number (16 digits)" style="margin-bottom:10px;" id="card-num">
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" class="form-control" placeholder="MM/YY" id="card-expiry">
+                                <input type="password" class="form-control" placeholder="CVV" id="card-cvv">
+                            </div>
+                            <p style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 5px;">Dummy Hint: <strong>4321 5432 6543 7654</strong></p>
+                        </div>
+
+                        <div class="payment-option" onclick="selectPay(this, 'netbanking')">
+                            <span>🏦 Net Banking</span>
+                            <div class="radio-circle"></div>
+                        </div>
+                        <div id="netbanking-fields" class="payment-fields" style="display: none;">
+                            <input type="text" class="form-control" placeholder="Login ID" style="margin-bottom:10px;" id="nb-user">
+                            <input type="password" class="form-control" placeholder="Password" id="nb-pass">
+                            <p style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 5px;">Dummy Hint: <strong>agri_user / pass123</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="width: 100%; padding: 15px; font-weight: 700;" onclick="processSimulation()">PAY NOW</button>
+                <p style="text-align: center; color: var(--text-secondary); font-size: 0.65rem; margin-top: 15px;">
+                    🔒 Secured by AgriPredict 256-bit SSL Encryption
+                </p>
+            </div>
+            
+            <div id="payment-loader" class="glass-panel" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); z-index: 100;">
+                <div class="spinner"></div>
+                <p style="margin-top: 20px; color: white; font-weight: 600;">Processing Secure Payment...</p>
+                <p style="font-size: 0.7rem; color: var(--text-secondary);">Do not refresh the page</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUser();
+            if(!user) {
+                window.location.href = '/auth';
+            } else {
+                loadMarketplace();
+            }
+        });
+
+        let selectedListingId = null;
+        let currentPricePerTon = 0;
+
+        async function loadMarketplace() {
+            const grid = document.getElementById('marketplace-grid');
+            const user = getUser();
+            try {
+                const res = await fetch('/api/marketplace');
+                const listings = await res.json();
+                
+                grid.innerHTML = '';
+                if(listings.length === 0) {
+                    grid.innerHTML = '<p style="color:var(--text-secondary)">No listings available at the moment.</p>';
+                    return;
+                }
+
+                listings.forEach(l => {
+                    const div = document.createElement('div');
+                    div.className = 'glass-panel crop-card';
+                    div.innerHTML = `
+                        <div class="crop-header">
+                            <h3>${l.crop_name}</h3>
+                            <span class="tag">${l.farmer_location}</span>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <p style="color:var(--text-secondary)">Farmer: <strong>${l.farmer_name}</strong></p>
+                            <p style="color:var(--text-secondary)">Quantity: <strong>${l.quantity_tons} Tons</strong></p>
+                            <p class="crop-price">₹${l.price_per_ton} / Ton</p>
+                        </div>
+                        <button class="btn-primary" style="width:100%" onclick="openPayment(${l.id}, ${l.price_per_ton}, ${l.quantity_tons})">Set Tons & Buy</button>
+                    `;
+                    grid.appendChild(div);
+                });
+            } catch(err) {
+                console.error("Error loading marketplace", err);
+            }
+        }
+
+        function openPayment(id, price, max) {
+            selectedListingId = id;
+            currentPricePerTon = price;
+            document.getElementById('purchase-qty').value = max;
+            document.getElementById('purchase-qty').max = max;
+            document.getElementById('max-available').innerText = max;
+            
+            updateTotal();
+            document.getElementById('pay-orderid').innerText = `#AP-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('paymentModal').classList.add('show');
+        }
+
+        function updateTotal() {
+            const qty = document.getElementById('purchase-qty').value || 0;
+            const total = qty * currentPricePerTon;
+            document.getElementById('pay-amount').innerText = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        }
+
+        function selectPay(el, method) {
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.payment-fields').forEach(f => f.style.display = 'none');
+            el.classList.add('selected');
+            document.getElementById(`${method}-fields`).style.display = 'block';
+        }
+
+        function processSimulation() {
+            const qty = parseFloat(document.getElementById('purchase-qty').value);
+            const max = parseFloat(document.getElementById('max-available').innerText);
+
+            if(!qty || qty <= 0 || qty > max) {
+                alert(`Please enter a valid quantity between 1 and ${max} tons.`);
+                return;
+            }
+
+            // Basic dummy validation
+            const currentMethod = document.querySelector('.payment-option.selected').innerText;
+            
+            if(currentMethod.includes('UPI')) {
+                if(!document.getElementById('upi-id').value) { alert("Please enter dummy UPI ID"); return; }
+            } else if(currentMethod.includes('Card')) {
+                if(!document.getElementById('card-num').value) { alert("Please enter dummy Card Number"); return; }
+            } else if(currentMethod.includes('Net Banking')) {
+                if(!document.getElementById('nb-user').value) { alert("Please enter dummy Username"); return; }
+            }
+
+            document.getElementById('payment-loader').style.display = 'flex';
+            
+            // Simulate gateway processing delay
+            setTimeout(async () => {
+                const user = getUser();
+                const res = await fetch('/api/express_interest', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        listing_id: selectedListingId,
+                        vendor_id: user.id,
+                        quantity_set: qty
+                    })
+                });
+
+                document.getElementById('payment-loader').style.display = 'none';
+                document.getElementById('paymentModal').classList.remove('show');
+
+                if(res.ok) {
+                    document.getElementById('dealModal').classList.add('show');
+                } else {
+                    alert("Payment failed or error connecting with farmer.");
+                }
+            }, 3000);
+        }
+
+        function closeDealModal() {
+            document.getElementById('dealModal').classList.remove('show');
+            loadMarketplace(); // Refresh
+        }
+        function closeDealModal() {
+            document.getElementById('dealModal').classList.remove('show');
+        }
+    </script>
+
+    {% include 'chatbot_widget.html' %}
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - AgriPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 9L3 22H21L21 9L12 2Z" fill="#2ecc71" opacity="0.3"/>
+                <path d="M12 5V22M12 12C9 12 7 9 7 9C7 9 9 6 12 6C15 6 17 9 17 9C17 9 15 12 12 12Z" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <a href="/">AgriPredict</a>
+        </div>
+    </nav>
+
+    <div class="container auth-wrapper">
+        <div class="glass-panel auth-card">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+                <div class="auth-tab" onclick="switchTab('register')">Register</div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" class="form-control" required placeholder="farmer@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" class="form-control" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" onsubmit="handleRegister(event)" style="display: none;">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" class="form-control" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" class="form-control" required placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-password" class="form-control" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <select id="reg-role" class="form-control" required onchange="toggleRequirements()">
+                        <option value="Farmer">Farmer</option>
+                        <option value="Vendor">Vendor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="reg-phone" class="form-control" required placeholder="+91 0000000000">
+                </div>
+                <div class="form-group">
+                    <label>Location (City/State)</label>
+                    <input type="text" id="reg-location" class="form-control" required placeholder="e.g. Mumbai, Maharashtra">
+                </div>
+                <div class="form-group" id="req-group" style="display:none;">
+                    <label>Product Requirements (Volume/Crops)</label>
+                    <textarea id="reg-requirements" class="form-control" rows="3" placeholder="What are you looking to buy?"></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+            
+            <div id="auth-error" style="color: #e74c3c; margin-top: 15px; text-align: center; display: none;"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            if(tab === 'login') {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+            } else {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+            }
+            document.getElementById('auth-error').style.display = 'none';
+        }
+
+        function toggleRequirements() {
+            const role = document.getElementById('reg-role').value;
+            const reqGroup = document.getElementById('req-group');
+            if(role === 'Vendor') {
+                reqGroup.style.display = 'block';
+            } else {
+                reqGroup.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
